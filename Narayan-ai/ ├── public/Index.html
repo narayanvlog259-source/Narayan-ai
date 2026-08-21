@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Narayan AI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #ffffff;
+      color: #202123;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .app {
+      height: 100vh;
+      display: flex;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+      width: 260px;
+      background: #171717;
+      color: white;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 25px;
+    }
+
+    .new-chat {
+      border: 1px solid #555;
+      background: transparent;
+      color: white;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .new-chat:hover {
+      background: #2a2a2a;
+    }
+
+    .side-bottom {
+      margin-top: auto;
+      color: #aaa;
+      font-size: 13px;
+    }
+
+    /* MAIN */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .topbar {
+      height: 60px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .chat {
+      flex: 1;
+      overflow-y: auto;
+      padding: 30px 15%;
+    }
+
+    .welcome {
+      text-align: center;
+      margin-top: 15vh;
+    }
+
+    .welcome h1 {
+      font-size: 35px;
+      margin-bottom: 10px;
+    }
+
+    .welcome p {
+      color: #777;
+      font-size: 16px;
+    }
+
+    .message {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 25px;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+    }
+
+    .user {
+      background: #555;
+    }
+
+    .ai {
+      background: #10a37f;
+    }
+
+    .text {
+      padding-top: 4px;
+      white-space: pre-wrap;
+    }
+
+    /* INPUT */
+    .input-area {
+      padding: 15px 15%;
+      border-top: 1px solid #eee;
+    }
+
+    .input-box {
+      display: flex;
+      align-items: center;
+      border: 1px solid #ccc;
+      border-radius: 14px;
+      padding: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      resize: none;
+      padding: 10px;
+      font-size: 16px;
+      height: 44px;
+    }
+
+    .send {
+      width: 42px;
+      height: 42px;
+      border: none;
+      border-radius: 10px;
+      background: #10a37f;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .send:hover {
+      background: #0d8c6d;
+    }
+
+    .disclaimer {
+      text-align: center;
+      color: #888;
+      font-size: 11px;
+      margin-top: 8px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 700px) {
+      .sidebar {
+        display: none;
+      }
+
+      .chat {
+        padding: 25px 15px;
+      }
+
+      .input-area {
+        padding: 10px;
+      }
+
+      .welcome h1 {
+        font-size: 28px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <aside class="sidebar">
+    <div class="logo">🤖 Narayan AI</div>
+
+    <button class="new-chat" onclick="newChat()">
+      ＋ New chat
+    </button>
+
+    <div class="side-bottom">
+      Narayan AI<br>
+      Your AI assistant
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="topbar">
+      Narayan AI
+    </div>
+
+    <div class="chat" id="chat">
+
+      <div class="welcome" id="welcome">
+        <h1>Namaste 👋</h1>
+        <p>I'm Narayan AI. How can I help you?</p>
+      </div>
+
+    </div>
+
+    <div class="input-area">
+
+      <div class="input-box">
+
+        <textarea
+          id="messageInput"
+          placeholder="Message Narayan AI..."
+          onkeydown="handleKey(event)"
+        ></textarea>
+
+        <button class="send" onclick="sendMessage()">
+          ↑
+        </button>
+
+      </div>
+
+      <div class="disclaimer">
+        Narayan AI can make mistakes. Check important information.
+      </div>
+
+    </div>
+
+  </main>
+
+</div>
+
+<script>
+
+  const input = document.getElementById("messageInput");
+  const chat = document.getElementById("chat");
+  const welcome = document.getElementById("welcome");
+
+  function handleKey(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      sendMessage();
+    }
+  }
+
+  function addMessage(text, type) {
+
+    if (welcome) {
+      welcome.style.display = "none";
+    }
+
+    const message = document.createElement("div");
+    message.className = "message";
+
+    const avatar = document.createElement("div");
+    avatar.className = "avatar " + type;
+
+    avatar.innerText = type === "user" ? "U" : "N";
+
+    const content = document.createElement("div");
+    content.className = "text";
+    content.innerText = text;
+
+    message.appendChild(avatar);
+    message.appendChild(content);
+
+    chat.appendChild(message);
+
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  async function sendMessage() {
+
+    const text = input.value.trim();
+
+    if (!text) return;
+
+    addMessage(text, "user");
+
+    input.value = "";
+
+    addMessage("Thinking...", "ai");
+
+    try {
+
+      /*
+        REAL AI BACKEND:
+        Vercel par /api/chat endpoint se AI response aayega.
+      */
+
+      const response = await fetch("/api/chat", {
+
+        method: "POST",
+
+        headers: {
+          "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+          message: text
+        })
+
+      });
+
+      const data = await response.json();
+
+      const messages = document.querySelectorAll(".message");
+      const lastMessage = messages[messages.length - 1];
+
+      if (data.reply) {
+        lastMessage.querySelector(".text").innerText = data.reply;
+      } else {
+        lastMessage.querySelector(".text").innerText =
+          "AI response nahi mila. Backend check karein.";
+      }
+
+    } catch (error) {
+
+      const messages = document.querySelectorAll(".message");
+      const lastMessage = messages[messages.length - 1];
+
+      lastMessage.querySelector(".text").innerText =
+        "Server se connection nahi ho raha. /api/chat setup karna hoga.";
+
+    }
+  }
+
+  function newChat() {
+
+    chat.innerHTML = `
+      <div class="welcome" id="welcome">
+        <h1>Namaste 👋</h1>
+        <p>I'm Narayan AI. How can I help you?</p>
+      </div>
+    `;
+
+  }
+
+</script>
+
+</body>
+  </html>
